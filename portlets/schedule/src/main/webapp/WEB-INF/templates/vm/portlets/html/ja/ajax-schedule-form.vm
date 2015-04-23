@@ -61,7 +61,7 @@
 #set($colspanmax = $colspanmax + 1)
 #end
 #if($result.SelectData.EndHour)#set($endHour = $!{result.SelectData.EndHour} - 1)#end
-##ALajaxscreenformheader("_scheduleForm" $jslink $portlet "ScheduleFormJSONScreen" "aimluck.io.selectAllOptions(this.member_to);aimluck.io.selectAllOptions(this.facility_to);aipo.schedule.onSubmit(this); aimluck.io.submit(this,'$indicator_id','$!portlet.ID',aipo.schedule.onReceiveMessage)")
+##ALajaxscreenformheader("_scheduleForm" $jslink $portlet "ScheduleFormJSONScreen" "aimluck.io.selectAllOptions(this.member_to);aimluck.io.selectAllOptions(this.facility_to);onSubmit(this); aimluck.io.submit(this,'$indicator_id','$!portlet.ID',aipo.schedule.onReceiveMessage)")
 <form id = "_scheduleForm" name="scheduleForm" action="$!jslink.getPortletById($!portlet.ID).addQueryData('template','ScheduleFormJSONScreen')" method="post" onsubmit="aimluck.io.selectAllOptions(this.member_to);aimluck.io.selectAllOptions(this.facility_to);aipo.schedule.onSubmit(this); aimluck.io.submit(this,'$indicator_id','$!portlet.ID',aipo.schedule.onReceiveMessage);return false;">
 <input type="hidden" name="ignore_duplicate_facility" value="false" />
 <input type="hidden" name="secid" value="$secid" />

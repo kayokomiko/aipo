@@ -40,7 +40,8 @@
 <span id="schedule_val_category1" style="display:none;">$l10n.SCHEDULE_OTHER</span>
 <span id="schedule_val_repeat1" style="display:none">$l10n.SCHEDULE_REPEATING</span>
 <span id="schedule_val_repeat2" style="display:none">$l10n.SCHEDULE_DONOT_REPEAT</span>
-<span id="schedule_val_span1" style="display:none">$l10n.SCHEDULE_SET_SPAN</span>
+<span id="schedule_val_span1" style="display:none">$l10n.
+</span>
 <span id="schedule_val_span2" style="display:none">$l10n.SCHEDULE_SET_TIME</span>
 <span id="schedule_val_confirm1" style="display:none">$l10n.SCHEDULE_CONFIRM_CREATED_SCHEDULE</span>
 <span id="schedule_val_member1" style="display:none">$l10n.SCHEDULE_SELECT_ENTRY_USER</span>
