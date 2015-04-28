@@ -371,8 +371,11 @@ aipo.schedule.formSpanOn = function(form) {
     dojo.byId('spanField').style.display = "";
     dojo.byId('allDayField').style.display = "none";
 
-    dojo.byId('facilityField').style.display = "none";
-    dojo.byId('facilityFieldButton').style.display = "none";
+    dojo.byId('facilityField').style.display = "block";
+    if (aipo.schedule.isShowFacility(form)) {
+        dojo.byId('facilityFieldButton').style.display = "block";
+        aipo.schedule.shrinkFacility();
+    }
 
     form.is_span.value = 'TRUE';
 
