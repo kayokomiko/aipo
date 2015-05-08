@@ -48,6 +48,9 @@
 #if ($!result.Viewtype == "oneday-group")
 #parse("/portlets/html/ja/schedule-oneday-group.vm")
 #end
+#if ($!result.Viewtype == "oneday-group")
+#parse("/portlets/html/ja/schedule-oneday-group.vm")
+#end
 ## Weekly
 #if ($!result.Viewtype == "weekly-group")
 #parse("/portlets/html/ja/schedule-weekly-group.vm")
