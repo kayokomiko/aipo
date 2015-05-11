@@ -18,28 +18,22 @@
  */
 package com.aimluck.eip.modules.screens;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.ListIterator;
-import java.util.Locale;
 
-import org.apache.cayenne.exp.Expression;
-import org.apache.cayenne.exp.ExpressionFactory;
 import org.apache.jetspeed.services.logging.JetspeedLogFactoryService;
 import org.apache.jetspeed.services.logging.JetspeedLogger;
 import org.apache.turbine.util.RunData;
 
-import com.aimluck.eip.cayenne.om.portlet.EipTEventlog;
-import com.aimluck.eip.cayenne.om.security.TurbineUser;
+import com.aimluck.eip.cayenne.om.portlet.EipTSchedule;
+import com.aimluck.eip.cayenne.om.portlet.VEipTScheduleList;
 import com.aimluck.eip.common.ALPermissionException;
-import com.aimluck.eip.eventlog.EventlogResultData;
-import com.aimluck.eip.eventlog.util.ALEventlogUtils;
 import com.aimluck.eip.orm.Database;
 import com.aimluck.eip.orm.query.ResultList;
 import com.aimluck.eip.orm.query.SelectQuery;
+import com.aimluck.eip.schedule.ScheduleResultData;
+import com.aimluck.eip.schedule.ScheduleSearchResultData;
 import com.aimluck.eip.util.ALEipUtils;
+import com.aimluck.eip.util.ALLocalizationUtils;
 
 /**
  *
@@ -67,32 +61,68 @@ public class ScheduleCsvExportScreen extends ALCSVScreen {
    * @param obj
    * @return
    */
-  protected EventlogResultData getResultData(EipTEventlog record) {
+  protected Object getResultData(VEipTScheduleList record) {
+    /* throws ALPageNotFoundException, ALDBErrorException { */
+
     try {
-      DateFormat df = new SimpleDateFormat("yyyy年MM月dd日(EE)HH:mm:ss");
-
-      EventlogResultData rd = new EventlogResultData();
+      ScheduleSearchResultData rd = new ScheduleSearchResultData();
       rd.initField();
-      rd.setEventlogId(record.getEventlogId().longValue());
+      if ("R".equals(record.getStatus())) {
+        return null;
+      }
 
-      TurbineUser user = record.getTurbineUser();
+      boolean is_member = record.isMember();
 
-      rd.setUserFullName(user == null ? "" : new StringBuffer().append(
-        user.getLastName()).append(" ").append(user.getFirstName()).toString());
+      if ("C".equals(record.getPublicFlag())
+        && (userid != record.getOwnerId().intValue())
+        && !is_member) {
+        rd.setName(ALLocalizationUtils.getl10n("SCHEDULE_CLOSE_PUBLIC_WORD"));
+        // 仮スケジュールかどうか
+        rd.setTmpreserve(false);
+      } else {
+        rd.setName(record.getName());
+        // 仮スケジュールかどうか
+        rd.setTmpreserve("T".equals(record.getStatus()));
+      }
 
-      rd.setEventDate(df.format(record.getUpdateDate()));
-      rd.setPortletName(ALEventlogUtils.getPortletAliasName(record
-        .getPortletType()));
-      rd.setEntityId(record.getEntityId().longValue());
-      rd.setIpAddr(record.getIpAddr());
-      rd.setEventName(ALEventlogUtils.getEventAliasName(record.getEventType()));
+      // ID
+      rd.setScheduleId(record.getScheduleId().intValue());
+      // 親スケジュール ID
+      rd.setParentId(record.getParentId().intValue());
+      // 開始日時
+      rd.setStartDate(record.getStartDate());
+      // 終了日時
+      rd.setEndDate(record.getEndDate());
+      // 公開するかどうか
+      rd.setPublic("O".equals(record.getPublicFlag()));
+      // 非表示にするかどうか
+      rd.setHidden("P".equals(record.getPublicFlag()));
+      // ダミーか
+      rd.setDummy("D".equals(record.getStatus()));
+      // ログインユーザかどうか
+      // rd.setLoginuser(is_member);
+      // オーナーかどうか
+      rd.setOwner(record.getOwnerId().intValue() == userid);
+      // 共有メンバーかどうか
+      rd.setMember(is_member);
+      // 繰り返しパターン
+      rd.setPattern(record.getRepeatPattern());
+      rd.setCreateUser(ALEipUtils.getALEipUser(record.getCreateUserId()));
       rd.setNote(record.getNote());
-      return rd;
-    } catch (Exception ex) {
-      logger.error("schedule", ex);
+      rd.setPlace(record.getPlace());
+      rd.setDescription(record.getNote());
+
+      if (!rd.getPattern().equals("N") && !rd.getPattern().equals("S")) {
+        rd.setRepeat(true);
+      }
+    } catch (Exception e) {
+      logger.error("schedule", e);
       return null;
     }
+    return rd;
   }
+
+  // }
 
   /**
    *
@@ -100,32 +130,15 @@ public class ScheduleCsvExportScreen extends ALCSVScreen {
   @Override
   protected String getCSVString(RunData rundata) throws Exception {
     if (ALEipUtils.isAdmin(rundata)) {
-      SelectQuery<EipTEventlog> query = Database.query(EipTEventlog.class);
+      SelectQuery<EipTSchedule> query = Database.query(EipTSchedule.class);
 
-      Date startDay =
-        DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.JAPAN).parse(
-          rundata.getParameters().get("start_day"));
-      Date endDay =
-        DateFormat.getDateInstance(DateFormat.DEFAULT, Locale.JAPAN).parse(
-          rundata.getParameters().get("end_day"));
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(endDay);
-      cal.set(Calendar.DATE, cal.get(Calendar.DATE) + 1);
-      endDay = cal.getTime();
-      Expression exp1 =
-        ExpressionFactory.greaterOrEqualExp(
-          EipTEventlog.EVENT_DATE_PROPERTY,
-          startDay);
-      Expression exp2 =
-        ExpressionFactory.lessExp(EipTEventlog.EVENT_DATE_PROPERTY, endDay);
-      query.andQualifier(exp1.andExp(exp2));
-      ResultList<EipTEventlog> list = query.getResultList();
+      ResultList<EipTSchedule> list = query.getResultList();
       String LINE_SEPARATOR = System.getProperty("line.separator");
       try {
         StringBuffer sb =
-          new StringBuffer("\"日時\",\"名前\",\"機能名\",\"操作\",\"接続IP\",\"件名\"");
-        EventlogResultData data;
-        for (ListIterator<EipTEventlog> iterator =
+          new StringBuffer("\"日時\",\"タイトル\",\"作成者\",\"操作\",\"接続IP\",\"件名\"");
+        ScheduleResultData data;
+        for (ListIterator<EipTSchedule> iterator =
           list.listIterator(list.size()); iterator.hasPrevious();) {
           sb.append(LINE_SEPARATOR);
           data = getResultData(iterator.previous());
