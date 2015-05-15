@@ -280,6 +280,5 @@ ${record.FacilityNameHtml}<br/>
     #ALajaxbuttonClose()
 #end
 #ALbuttonfooter()
-
 #ALformfooter()
 #ALdialogfooter()

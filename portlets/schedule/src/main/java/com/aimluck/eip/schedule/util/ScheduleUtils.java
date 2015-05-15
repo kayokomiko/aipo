@@ -4091,4 +4091,34 @@ public class ScheduleUtils {
     }
     return true;
   }
+
+  /**
+   * @param valueOf
+   * @param tmpUsers
+   * @param facilities
+   * @param keyword
+   * @param page
+   * @param limit
+   * @return
+   */
+  public static ResultList<VEipTScheduleList> getScheduleList(Integer valueOf,
+      int tmpUsers, Object facilities, Object keyword, int page, int limit) {
+    return null;
+  }
+
+  /**
+   * @param valueOf
+   * @param tmpUsers
+   * @param facilities
+   * @param keyword
+   * @param page
+   * @param limit
+   * @return
+   */
+
+  public static ResultList<VEipTScheduleList> getScheduleList(Integer valueOf,
+      String tmpUsers, Object facilities, Object keyword, int page, int limit) {
+    return null;
+  }
+
 }

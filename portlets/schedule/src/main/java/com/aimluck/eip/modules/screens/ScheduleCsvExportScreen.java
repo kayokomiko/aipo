@@ -24,14 +24,13 @@ import org.apache.jetspeed.services.logging.JetspeedLogFactoryService;
 import org.apache.jetspeed.services.logging.JetspeedLogger;
 import org.apache.turbine.util.RunData;
 
-import com.aimluck.eip.cayenne.om.portlet.EipTSchedule;
 import com.aimluck.eip.cayenne.om.portlet.VEipTScheduleList;
+import com.aimluck.eip.common.ALDBErrorException;
+import com.aimluck.eip.common.ALPageNotFoundException;
 import com.aimluck.eip.common.ALPermissionException;
-import com.aimluck.eip.orm.Database;
 import com.aimluck.eip.orm.query.ResultList;
-import com.aimluck.eip.orm.query.SelectQuery;
-import com.aimluck.eip.schedule.ScheduleResultData;
 import com.aimluck.eip.schedule.ScheduleSearchResultData;
+import com.aimluck.eip.schedule.util.ScheduleUtils;
 import com.aimluck.eip.util.ALEipUtils;
 import com.aimluck.eip.util.ALLocalizationUtils;
 
@@ -39,6 +38,7 @@ import com.aimluck.eip.util.ALLocalizationUtils;
  *
  *
  */
+
 public class ScheduleCsvExportScreen extends ALCSVScreen {
 
   /** logger */
@@ -61,12 +61,16 @@ public class ScheduleCsvExportScreen extends ALCSVScreen {
    * @param obj
    * @return
    */
-  protected Object getResultData(VEipTScheduleList record) {
-    /* throws ALPageNotFoundException, ALDBErrorException { */
+
+  protected ScheduleSearchResultData getResultData(VEipTScheduleList record,
+      int userid)
+
+  throws ALPageNotFoundException, ALDBErrorException {
+    ScheduleSearchResultData rd = new ScheduleSearchResultData();
+    rd.initField();
 
     try {
-      ScheduleSearchResultData rd = new ScheduleSearchResultData();
-      rd.initField();
+
       if ("R".equals(record.getStatus())) {
         return null;
       }
@@ -119,6 +123,7 @@ public class ScheduleCsvExportScreen extends ALCSVScreen {
       logger.error("schedule", e);
       return null;
     }
+
     return rd;
   }
 
@@ -130,31 +135,42 @@ public class ScheduleCsvExportScreen extends ALCSVScreen {
   @Override
   protected String getCSVString(RunData rundata) throws Exception {
     if (ALEipUtils.isAdmin(rundata)) {
-      SelectQuery<EipTSchedule> query = Database.query(EipTSchedule.class);
+      // SelectQuery<EipTSchedule> query = Database.query(EipTSchedule.class);
 
-      ResultList<EipTSchedule> list = query.getResultList();
+      // ResultList<EipTSchedule> list = query.getResultList();
+
+      int userid = ALEipUtils.getUserId(rundata);
+      String tmpUsers = ALEipUtils.getUserFullName(userid);
+
+      ResultList<VEipTScheduleList> list =
+        ScheduleUtils.getScheduleList(
+          Integer.valueOf(userid),
+          tmpUsers,
+          null,
+          null,
+          1,
+          20);
+
       String LINE_SEPARATOR = System.getProperty("line.separator");
       try {
         StringBuffer sb =
           new StringBuffer("\"日時\",\"タイトル\",\"作成者\",\"操作\",\"接続IP\",\"件名\"");
-        ScheduleResultData data;
-        for (ListIterator<EipTSchedule> iterator =
+        ScheduleSearchResultData data;
+        for (ListIterator<VEipTScheduleList> iterator =
           list.listIterator(list.size()); iterator.hasPrevious();) {
           sb.append(LINE_SEPARATOR);
-          data = getResultData(iterator.previous());
+          data = getResultData(iterator.previous(), userid);
           sb.append("\"");
-          sb.append(data.getEventDate());
+          sb.append(data.getDate());
           sb.append("\",\"");
-          sb.append(data.getUserFullName());
+          sb.append(data.getDate2());
           sb.append("\",\"");
-          sb.append(data.getPortletName());
+          sb.append(data.getType());
           sb.append("\",\"");
-          sb.append(data.getEventName());
+          sb.append(data.getSpanDateText());
           sb.append("\",\"");
-          sb.append(data.getIpAddr());
+          sb.append(data.getCommonCategoryName());
           sb.append("\",\"");
-          sb.append(data.getNote());
-          sb.append("\"");
         }
         return sb.toString();
       } catch (Exception e) {
