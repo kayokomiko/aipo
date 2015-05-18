@@ -42,6 +42,8 @@
 #set($tab = ["$l10n.SCHEDULE_LIST", "list", "$!jslink.getPortletById($!portlet.ID).addQueryData('template',$!{schedulescreen}).addQueryData('tab','list')"])
 <li #if ($tab.get(1) == $!result.Viewtype) class="active"#end><a class="last" style="width:4em;" href="javascript:void(0);" onclick="aipo.schedule.setIndicator('$!portlet.ID');aipo.viewPage('$!utils.escapeXML($tab.get(2))', '$!portlet.ID');"><span>$tab.get(0)</span></a></li>
 </ul>
+#set($title = ["$l10n.SCHEDULE_EXPORT", "list", "$!jslink.getPortletById($!portlet.ID).addQueryData('template',$!{schedulescreen}).addQueryData('title','list')"])
+<a class="auiButton" title="$title" href="javascript:void(0);" onclick="aipo.schedule.downloadCvn(${result.isOverSize()},${result.MaxSize},'$dlLink');"><span>$title</span></a>
 #end
 </div>
 </div>

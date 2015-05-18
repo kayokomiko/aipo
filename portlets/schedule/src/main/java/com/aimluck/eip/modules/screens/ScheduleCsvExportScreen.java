@@ -135,7 +135,8 @@ public class ScheduleCsvExportScreen extends ALCSVScreen {
   @Override
   protected String getCSVString(RunData rundata) throws Exception {
     if (ALEipUtils.isAdmin(rundata)) {
-      // SelectQuery<EipTSchedule> query = Database.query(EipTSchedule.class);
+      // SelectQuery<VEipTScheduleList> query =
+      // Database.query(VEipTScheduleList.class);
 
       // ResultList<EipTSchedule> list = query.getResultList();
 
