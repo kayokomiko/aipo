@@ -246,7 +246,6 @@
 <div id="memberField" style="display:none;">
 <table class="none">
   <tr><td>
-    <div class="spaceTop spaceLeft small">$l10n.SCHEDULE_ADD_ENTRY_USER</div>
     <div dojoType="aipo.widget.MemberNormalSelectList"
         id="membernormalselect"
         widgetId="membernormalselect"
