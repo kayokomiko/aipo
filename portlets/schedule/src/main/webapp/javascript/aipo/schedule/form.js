@@ -52,6 +52,98 @@ aipo.schedule.toggleMenu=function (node,filters,event){
         dojo.query("div.menubar").style("display", "none");
     }
 };
+/**
+ * urlを整形して送信。
+ */
+aipo.schedule.filteredSearch=function(portlet_id){
+	//filtertype
+
+	var baseuri=dojo.byId("baseuri_"+portlet_id).value;
+
+	var types=[];
+	var params=[];
+	dojo.query("ul.filtertype_"+portlet_id).forEach(function(ul){
+			//console.info(ul);
+			var type=ul.getAttribute("data-type");
+			types.push(type);
+
+			var activeli=dojo.query("li.selected",ul)[0];
+			if(activeli){
+				var param=activeli.getAttribute("data-param");
+				params.push(param);
+			}else{
+				params.push(ul.getAttribute("data-defaultparam"));
+			}
+		}
+	);
+	var q=dojo.byId("q"+portlet_id);
+	var qs=[["filter",params.join(",")],
+	        ["filtertype",types.join(",")],
+		["keyword",q?q.value:""]
+	];
+	aipo.viewPage(baseuri,portlet_id,qs);
+};
+
+/**
+ * 指定したフィルタにデフォルト値を設定する。(または消す)
+ * @param portlet_id
+ * @param thisnode
+ * @param event
+ */
+aipo.schedule.filterSetDefault=function(portlet_id,type){
+	var ul=dojo.query("ul.filtertype[data-type="+type+"]")[0];
+	var defval=ul.getAttribute("data-defaultparam");
+	var defaultli=dojo.query("li[data-param="+defval+"]",ul);
+	aipo.schedule.filterSelect(ul,defaultli);
+	aipo.schedule.filteredSearch(portlet_id);
+};
+
+aipo.schedule.filterSelect=function(ul,li){
+	dojo.query("li",ul).removeClass("selected");
+	dojo.query(li).addClass("selected");
+};
+
+/**
+ * フィルタを選択した時に発生させるイベント　クリックされたノードをフィルタに追加
+ * @param portlet_id
+ * @param thisnode
+ * @param event
+ */
+aipo.schedule.filterClick=function(portlet_id,thisnode,event){
+	var li=thisnode.parentNode;
+	var ul=li.parentNode;
+	var param=li.getAttribute("data-param");//liのdata-param
+	aipo.schedule.filterSelect(ul,li);
+	aipo.schedule.filteredSearch(portlet_id);
+};
+
+aipo.schedule.onLoadscheduleDialog = function(portlet_id){
+  var url_userlist = dojo.byId('urlUserlist'+portlet_id).value;
+  var login_user_id = dojo.byId('loginUser'+portlet_id).value;
+  var schedule_user_id = dojo.byId('scheduleUser'+portlet_id).value;
+
+  if(schedule_user_id == 0) {
+      schedule_user_id = login_user_id;
+  }
+  if(url_userlist){
+      aipo.schedule.changeGroup(url_userlist, 'LoginUser', schedule_user_id);
+  }
+
+  var obj = dojo.byId("schedule_name");
+  if(obj){
+     obj.focus();
+  }
+}
+
+aipo.schedule.changeGroup = function(link, group, sel) {
+    aimluck.utils.form.createSelect("user_id", "destuserDiv", link + "?mode=group&groupname=" + group + "&inc_luser=true", "userId", "aliasName", sel, '', 'class="w49"');
+}
+aipo.schedule.doKeywordSearch = function(baseuri, portlet_id) {
+    var params = new Array(2);
+    params[0] = ["template", "ScheduleListScreen"];
+    params[1] = ["keyword", dojo.byId("q"+portlet_id).value];
+    aipo.viewPage(baseuri, portlet_id, params);
+}
 aipo.schedule.setupTooltip = function(url, entityids, portlet_id) {
     ptConfig[portlet_id].isTooltipEnable = true;
 
