@@ -44,8 +44,12 @@ dojo.declare("aipo.widget.MemberNormalSelectList", [dijit._Widget, dijit._Templa
     groupSelectOptionValue: "",
     memberGroupUrl: "",
     changeGroupUrl: "",
+    groupSelectLink:"",
+    memberNameValue:"",
     /*ユーザー選択部分のdiv要素*/
-    templateString:"<div id=\"${widgetId}\" widgetId=\"${widgetId}\"><table class=\"none\" style=\"table-layout: fixed;\"><tr><td><div id=\"memberPopupDiv\"><div class=\"outer\"><div class=\"popup\"><div class=\"clearfix\"><div class=\"memberlistToTop\" >${memberToTitle}</div><div class=\"memberlistFromTop\"><select size=\"1\" style=\"width:100%\" name=\"${groupSelectId}\" id=\"${groupSelectId}\" dojoAttachEvent=\"onchange:changeGroup\"></select></div></div><div class=\"clearfix mb5\"><div class=\"memberlistToBody\"><select size=\"5\" multiple=\"multiple\" style=\"width:100%\" name=\"${memberToId}\" id=\"${memberToId}\"></select></div><div class=\"memberlistFromBody\"><select size=\"5\" multiple=\"multiple\" style=\"width:100%\" name=\"${memberFromId}\" id=\"${memberFromId}\"></select></div></div><div class=\"clearfix\"><div class=\"memberlistToBottom\"><div class=\"alignright\"><input id=\"${buttonRemoveId}\" name=\"${buttonRemoveId}\" type=\"button\" class=\"button\" value=\""+nlsStrings.DELETEBTN_STR+"\"/ dojoAttachEvent=\"onclick:onMemberRemoveClick\"></div></div><div class=\"memberlistFromBottom\"><div style=\"display: none;\" id=\"${widgetId}-memberlist-indicator\" class=\"indicator alignleft\">読み込み中</div><div class=\"alignright\"><input id=\"${buttonAddId}\" name=\"${buttonAddId}\" type=\"button\" class=\"button\" value=\""+nlsStrings.ADDBTN_STR+"\"/ dojoAttachEvent=\"onclick:onMemberAddClick\"></div></div></div></div></div></div></td></tr></table></div>\n",
+//    templateString:"<div id=\"${widgetId}\" widgetId=\"${widgetId}\"><table class=\"none\" style=\"table-layout: fixed;\"><tr><td><div id=\"memberPopupDiv\"><div class=\"outer\"><div class=\"popup\"><div class=\"clearfix\"><div class=\"memberlistToTop\" >${memberToTitle}</div><div class=\"memberlistFromTop\"><select size=\"1\" style=\"width:100%\" name=\"${groupSelectId}\" id=\"${groupSelectId}\" dojoAttachEvent=\"onchange:changeGroup\"></select></div></div><div class=\"clearfix mb5\"><div class=\"memberlistToBody\"><select size=\"5\" multiple=\"multiple\" style=\"width:100%\" name=\"${memberToId}\" id=\"${memberToId}\"></select></div><div class=\"memberlistFromBody\"><select size=\"5\" multiple=\"multiple\" style=\"width:100%\" name=\"${memberFromId}\" id=\"${memberFromId}\"></select></div></div><div class=\"clearfix\"><div class=\"memberlistToBottom\"><div class=\"alignright\"><input id=\"${buttonRemoveId}\" name=\"${buttonRemoveId}\" type=\"button\" class=\"button\" value=\""+nlsStrings.DELETEBTN_STR+"\"/ dojoAttachEvent=\"onclick:onMemberRemoveClick\"></div></div><div class=\"memberlistFromBottom\"><div style=\"display: none;\" id=\"${widgetId}-memberlist-indicator\" class=\"indicator alignleft\">読み込み中</div><div class=\"alignright\"><input id=\"${buttonAddId}\" name=\"${buttonAddId}\" type=\"button\" class=\"button\" value=\""+nlsStrings.ADDBTN_STR+"\"/ dojoAttachEvent=\"onclick:onMemberAddClick\"></div></div></div></div></div></div></td></tr></table></div>\n",
+//    templateString:"<div id=\"memberPopupDiv_2\"><div class=\"selectListWrap\"><div class=\"selectListHead clearfix\"><table class=\"none\"><tbody><tr><td class=\"thin center\"><input type=\"checkbox\"></td><td><div class=\"filterInputField\"><a href=\"javascript:void(0);\" onclick=\"${groupSelectLink}\" title=\"フィルタ\" class=\"filterDropDrawer menubarOpenButton\"><span><i class=\"auiIcon auiIconArwBottom\"></i></span></a><input class=\"text w100\" type=\"text\" name=\"q\" id=\"q\" placeholder=\"ユーザー名で絞り込む\"></div></td></tr></tbody></table></div><div class=\"clearfix\"><div class=\"selectListLeft\"><div class=\"selectList\"><table class=\"wide\"><tbody><tr class=\"select\"><td class=\"thin center\"><input type=\"checkbox\" id=\"\" value=\"\" name=\"\" checked=\"checked\"></td><td class=\"thin center\"><span class=\"avatar\"><img width=\"24\" height=\"24\" class=\"avatar_s\" src=\"themes/default/images/common/avatar_default3.png\" alt=\"\"></span></td><td>${memberFromId}</td></tr></tbody></table></div></div></div></div></div></div>\n",
+    templateString:"<div id=\"memberPopupDiv_2\"><div class=\"selectListWrap\"><div class=\"selectListHead clearfix\"><table class=\"none\"><tbody><tr><td class=\"thin center\"><input type=\"checkbox\"></td><td><div class=\"filterInputField\"><a href=\"javascript:void(0);\" onclick=\"${groupSelectLink}\" title=\"フィルタ\" class=\"filterDropDrawer menubarOpenButton\"><span><i class=\"auiIcon auiIconArwBottom\"></i></span></a><input class=\"text w100\" type=\"text\" name=\"q\" id=\"q\" placeholder=\"ユーザー名で絞り込む\"></div></td></tr></tbody></table></div><div class=\"clearfix\"><div class=\"selectListLeft\"><div class=\"selectList\"><table id=\"selectMemberListBody\" class=\"wide\"><tbody></tbody></table></div></div></div></div></div>\n",
     postCreate: function(){
         this.id = this.widgetId;
         params = {
@@ -227,7 +231,15 @@ dojo.declare("aipo.widget.MemberNormalSelectList", [dijit._Widget, dijit._Templa
       	  var wrapper = document.getElementById('wrapper');
       	  wrapper.style.minHeight = modalDialog.clientHeight + 'px';
         }
+    },
+    memberSelectFormBody: function(){
+        //tbodyのIDを取得
+    	   var data = [{name:this.memberNameValue}];
+
+    	   Object.keys(data).forEach(function (key) {
+    		      html = '<tr class="select"><td class="thin center"><input type="checkbox" id="" value="" name="" checked="checked"></td><td class=\"thin center\">'+data.v+'</td></tr>';
+    		      $('#selectMemberListBody tbody').append(html);
+    		    });
     }
 });
-
 }

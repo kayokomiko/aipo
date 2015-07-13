@@ -246,7 +246,6 @@
 <div id="memberField" style="display:none;">
 <table class="none">
   <tr><td>
-    <div class="spaceTop spaceLeft small">$l10n.SCHEDULE_ADD_ENTRY_USER</div>
     <div dojoType="aipo.widget.MemberNormalSelectList"
         id="membernormalselect"
         widgetId="membernormalselect"
@@ -264,9 +263,25 @@
         groupSelectOptionKey="groupId"
         groupSelectOptionValue="name"
         memberGroupUrl="$!jslink.getPortletById($!portlet.ID).addQueryData('template','ScheduleUserGroupLiteJSONScreen').addQueryData('mode','mygroup_and_post')"
-        changeGroupUrl="$!jslink.getPortletById($!portlet.ID).addQueryData('template','UserLiteJSONScreen').addQueryData('mode','group')">
+        changeGroupUrl="$!jslink.getPortletById($!portlet.ID).addQueryData('template','UserLiteJSONScreen').addQueryData('mode','group')"
+        groupSelectLink="aipo.schedule.toggleMenu(dojo.byId('menubar_auiFilter_$!portlet.ID'),dojo.byId('filters_$!portlet.ID'),true)"
+        memberNameValue="テスト">
     </div>
     <select size="5" multiple="multiple" style="display:none;" name="init_memberlist" id="init_memberlist">#foreach($record in $!result.MemberList)<option value="$!record.Name">$!record.AliasName</option>#end</select>
+    <div class="menubar multi " id="menubar_auiFilter_$!portlet.ID" style="display:none;">
+	<div>
+		<p class="caption">$l10n.COMMON_GROUP</p>
+		<ul class="filtertype_$!portlet.ID"data-type="post" data-defaultparam="0">
+			<li data-param="0"><a href="javascript:void(0)"  #if (!$!result.issetFilter("post")) class="selected" #end onclick='aipo.schedule.filterClick("$!portlet.ID",this,event)'>$l10n.SCHEDULE_ALL_GLOUP</a></li>
+
+			#foreach($record in $result.postList)
+			<li #if ($!result.issetFilter("post",$record.Name)) class="selected" #end  data-param="$record.Name"><a href="javascript:void(0)"  #if ($!result.issetFilter("post",$record.Name)) class="selected" #end onclick='aipo.schedule.filterClick("$!portlet.ID",this,event)' >$record.AliasName</a></li>
+			#end
+			#foreach($record in $result.PostMap)
+			<li #if ($!result.issetFilter("post",$!{record.GroupName})) class="selected" #end data-param="$!{record.GroupName}" ><a href="javascript:void(0)" #if ($!result.issetFilter("post",$!{record.GroupName})) class="selected" #end onclick='aipo.schedule.filterClick("$!portlet.ID",this,event)'>$!record.PostName</a></li>
+			#end
+		</ul>
+	</div>
   </td></tr>
   <tr><td>
 #if($!{result.Owner} || $!{result.EditFlag.toString()} == "T")
@@ -335,7 +350,6 @@
     <select size="5" multiple="multiple" style="display:none;" name="init_facilitylist" id="init_facilitylist">#foreach($record in $!result.FacilityList)<option value="$!record.FacilityId">$!record.FacilityName</option>#end</select>
 </div>
 #ALtditemfooter()
-
 #ALtablefooter()
 #ALbuttonheader()
 #ALsubmit($event_submit $action_str)#ALajaxbuttonClose()
